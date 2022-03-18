@@ -1,4 +1,5 @@
-# Gopherexercises: Sitemap Task
+# Gopherexercises: Sitemap Task - NOT FINISHED
+SITEMAP XML File in progress
 
 A sitemap is basically a map of all of the pages within a specific domain. They are used by search engines and other tools to inform them of all of the pages on your domain.
 
@@ -78,5 +79,3 @@ b->d
 ```
 
 Where there is also a link to page **`d`** from page **`b`**, then your sitemap builder should include **`d`** because it can be reached in 3 links.
-
-*Hint - I find using a BFS ([breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search)) is the best way to achieve this bonus exercise without doing extra work, but it isn’t required and you could likely come up with a working solution without using a BFS.*
