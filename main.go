@@ -24,7 +24,7 @@ type Url struct {
 
 func main() {
 
-	startPage := flag.String("start_page", "https://dave.cheney.net/", "Starting URL")
+	startPage := flag.String("start_page", "https://gobyexample.com", "Starting URL")
 	flag.Parse()
 
 	pg := CreatePageGetter()
@@ -40,34 +40,22 @@ func main() {
 
 	cnt := 1
 
-	var xmlOut []byte
-	ioutil.WriteFile("sitemap.xml", []byte(xml.Header), 0)
+	var xmlOut []byte = []byte(xml.Header)
 
-	for !pageDb.IsEmpty() && cnt <= 3 {
+	for !pageDb.IsEmpty() && cnt <= 2 {
 		p := pageDb.PopPage()
-		pageContents := string(p.GetContents())
 
-		links, err := htmlParser.GetLinks(pageContents)
+		links, err := ExtractLinksFromPage(p, htmlParser)
 		if err != nil {
 			panic(err)
 		}
 
-		// ADDING DOMAINS TO LINKS
 		AddDomainToLinks(links, p.GetURL())
 
-		// HERE WE SHOULD CREATE A SITEMAP (BUGGY!)
-
-		for _, l := range links {
-			u := &Url{Location: l.GetHref()}
-			out, err := xml.MarshalIndent(&u, " ", "  ")
-			xmlOut = append(xmlOut, out...)
-
-			if err != nil {
-				panic(err)
-			}
+		xmlOut, err = ConvertURLsToXML(xmlOut, links)
+		if err != nil {
+			panic(err)
 		}
-
-		ioutil.WriteFile("sitemap.xml", xmlOut, 0)
 
 		for k, l := range links {
 			AddNewPages(pg, pageDb, l)
@@ -76,6 +64,33 @@ func main() {
 
 		cnt++
 	}
+	err = ioutil.WriteFile("sitemap.xml", []byte(xml.Header), 0644)
+	err = ioutil.WriteFile("sitemap.xml", xmlOut, 0644)
+
+}
+
+func ExtractLinksFromPage(p *page.Page, htmlParser *HTMLParser) (map[string]*Link, error) {
+	pageContents := string(p.GetContents())
+
+	links, err := htmlParser.GetLinks(pageContents)
+	if err != nil {
+		return nil, err
+	}
+
+	return links, err
+}
+
+func ConvertURLsToXML(xmlOut []byte, links map[string]*Link) ([]byte, error) {
+	for _, l := range links {
+		u := &Url{Location: l.GetHref()}
+		out, err := xml.MarshalIndent(&u, " ", "  ")
+		xmlOut = append(xmlOut, out...)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	return xmlOut, nil
 }
 
 func AddNewPages(pg *PageGetter, pageDb *PageDB, l *Link) {
