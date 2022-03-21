@@ -1,5 +1,4 @@
-# Gopherexercises: Sitemap Task - NOT FINISHED
-SITEMAP XML File in progress
+# Gopherexercises: Sitemap Task
 
 A sitemap is basically a map of all of the pages within a specific domain. They are used by search engines and other tools to inform them of all of the pages on your domain.
 
